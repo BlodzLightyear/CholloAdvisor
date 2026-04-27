@@ -53,22 +53,17 @@ async function checkSearchPrices(search) {
 
 async function runAllActiveSearches() {
   const searches = findAllActiveSearches();
-  for (const search of searches) {
-    await checkSearchPrices(search);
-  }
+  const now = Date.now();
+  const due = searches.filter(s => {
+    if (!s.last_checked_at) return true;
+    const lastMs = new Date(s.last_checked_at).getTime();
+    return now - lastMs >= s.frequency_hours * 3600 * 1000;
+  });
+  for (const search of due) await checkSearchPrices(search);
 }
 
 function startPriceMonitor() {
-  cron.schedule('*/30 * * * *', async () => {
-    const searches = findAllActiveSearches();
-    const now = Date.now();
-    const due = searches.filter(s => {
-      if (!s.last_checked_at) return true;
-      const lastMs = new Date(s.last_checked_at).getTime();
-      return now - lastMs >= s.frequency_hours * 3600 * 1000;
-    });
-    for (const search of due) await checkSearchPrices(search);
-  });
+  cron.schedule('*/30 * * * *', runAllActiveSearches);
   console.log('Price monitor cron started (runs every 30min, checks per-search frequency)');
 }
 
