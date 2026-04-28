@@ -1,0 +1,13 @@
+# Backend
+backend/node_modules/
+backend/cholloadvisor.db
+backend/.env
+
+# Mobile
+mobile/node_modules/
+mobile/.expo/
+mobile/google-services.json
+
+# General
+.DS_Store
+*.log
