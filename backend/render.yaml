@@ -10,9 +10,7 @@ services:
         value: production
       - key: JWT_SECRET
         sync: false
-      - key: AMADEUS_CLIENT_ID
-        sync: false
-      - key: AMADEUS_CLIENT_SECRET
+      - key: IGNAV_API_KEY
         sync: false
       - key: TURSO_DATABASE_URL
         sync: false

@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { findAllActiveSearches, updateSearch } = require('../models/searchModel');
 const { recordPrice, saveNotification } = require('../models/priceModel');
-const { searchFlights } = require('./amadeusService');
+const { searchFlights } = require('./flightService');
 const { sendPushNotification } = require('./fcmService');
 const { findUserById } = require('../models/userModel');
 
