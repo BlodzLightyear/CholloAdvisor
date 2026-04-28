@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { loadSettings, saveSettings } from '../store/settingsStore';
 import { logout } from '../store/authStore';
+import { useAuth } from '../store/authContext';
 import client from '../api/client';
 
 const FREQ_OPTIONS = [1, 3, 6, 12, 24];
 const THRESHOLD_OPTIONS = [5, 10, 15, 20, 30];
 
-export default function SettingsScreen({ navigation }) {
+export default function SettingsScreen() {
+  const { setAuthed } = useAuth();
   const [settings, setSettings] = useState({ defaultFrequencyHours: 6, alertThresholdEuros: 10 });
 
   useEffect(() => { loadSettings().then(setSettings); }, []);
@@ -28,16 +30,20 @@ export default function SettingsScreen({ navigation }) {
     Alert.alert('Eliminar datos', '¿Eliminar todas tus búsquedas y datos? Esta acción no se puede deshacer.', [
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Eliminar todo', style: 'destructive', onPress: async () => {
-        const searches = (await client.get('/searches')).data.searches;
-        await Promise.all(searches.map(s => client.delete(`/searches/${s.id}`)));
-        Alert.alert('Listo', 'Todos los datos eliminados');
+        try {
+          const searches = (await client.get('/searches')).data.searches;
+          await Promise.all(searches.map(s => client.delete(`/searches/${s.id}`)));
+          Alert.alert('Listo', 'Todos los datos eliminados');
+        } catch {
+          Alert.alert('Error', 'No se pudieron eliminar todos los datos');
+        }
       }},
     ]);
   }
 
   async function handleLogout() {
     await logout();
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    setAuthed(false);
   }
 
   return (

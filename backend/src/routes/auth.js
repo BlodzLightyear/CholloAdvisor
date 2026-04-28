@@ -23,12 +23,17 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await findUserByEmailWithCredentials(email);
-  if (!user || !verifyPassword(password, user.password_hash)) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+  try {
+    const user = await findUserByEmailWithCredentials(email);
+    if (!user || !verifyPassword(password, user.password_hash)) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const safeUser = await findUserById(user.id);
+    res.json({ token: signToken(user.id), user: safeUser });
+  } catch {
+    res.status(500).json({ error: 'Server error' });
   }
-  const safeUser = await findUserById(user.id);
-  res.json({ token: signToken(user.id), user: safeUser });
 });
 
 router.put('/fcm-token', requireAuth, async (req, res) => {

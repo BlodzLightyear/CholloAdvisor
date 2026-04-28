@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, FlatList, Text, TouchableOpacity, StyleSheet, Linking, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import client from '../api/client';
+import { useAuth } from '../store/authContext';
 
 function NotificationItem({ item }) {
   return (
@@ -21,13 +22,18 @@ function NotificationItem({ item }) {
 }
 
 export default function NotificationsScreen() {
+  const { setAuthed } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const res = await client.get('/prices/notifications');
-    setNotifications(res.data.notifications);
-  }, []);
+    try {
+      const res = await client.get('/prices/notifications');
+      setNotifications(res.data.notifications);
+    } catch (err) {
+      if (err.response?.status === 401) setAuthed(false);
+    }
+  }, [setAuthed]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 

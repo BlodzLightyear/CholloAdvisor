@@ -3,8 +3,10 @@ import { View, FlatList, Text, TouchableOpacity, StyleSheet, Alert, RefreshContr
 import { useFocusEffect } from '@react-navigation/native';
 import SearchCard from '../components/SearchCard';
 import client from '../api/client';
+import { useAuth } from '../store/authContext';
 
 export default function ActiveSearchesScreen({ navigation }) {
+  const { setAuthed } = useAuth();
   const [searches, setSearches] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -13,9 +15,9 @@ export default function ActiveSearchesScreen({ navigation }) {
       const res = await client.get('/searches');
       setSearches(res.data.searches);
     } catch (err) {
-      if (err.response?.status === 401) navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+      if (err.response?.status === 401) setAuthed(false);
     }
-  }, [navigation]);
+  }, [setAuthed]);
 
   useFocusEffect(useCallback(() => { loadSearches(); }, [loadSearches]));
 

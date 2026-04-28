@@ -1,20 +1,12 @@
-import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { AuthProvider } from './src/store/authContext';
 import AppNavigator from './src/navigation/AppNavigator';
-import { registerForPushNotifications } from './src/utils/fcmSetup';
-import { isAuthenticated } from './src/store/authStore';
 
 export default function App() {
-  useEffect(() => {
-    isAuthenticated().then(authed => {
-      if (authed) registerForPushNotifications();
-    });
-  }, []);
-
   return (
-    <>
+    <AuthProvider>
       <StatusBar style="light" />
       <AppNavigator />
-    </>
+    </AuthProvider>
   );
 }

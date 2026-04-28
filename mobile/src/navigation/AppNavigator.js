@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,14 +11,19 @@ import SearchFormScreen from '../screens/SearchFormScreen';
 import PriceHistoryScreen from '../screens/PriceHistoryScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import { isAuthenticated } from '../store/authStore';
+import { useAuth } from '../store/authContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const screenOptions = {
+  headerStyle: { backgroundColor: '#1a1a2e' },
+  headerTintColor: '#fff',
+};
+
 function MainTabs() {
   return (
-    <Tab.Navigator screenOptions={{ tabBarStyle: { backgroundColor: '#1a1a2e' }, tabBarActiveTintColor: '#e94560', tabBarInactiveTintColor: '#aaa', headerStyle: { backgroundColor: '#1a1a2e' }, headerTintColor: '#fff' }}>
+    <Tab.Navigator screenOptions={{ tabBarStyle: { backgroundColor: '#1a1a2e' }, tabBarActiveTintColor: '#e94560', tabBarInactiveTintColor: '#aaa', ...screenOptions }}>
       <Tab.Screen name="Búsquedas" component={ActiveSearchesScreen} options={{ tabBarIcon: () => <Text>🔍</Text> }} />
       <Tab.Screen name="Notificaciones" component={NotificationsScreen} options={{ tabBarIcon: () => <Text>🔔</Text> }} />
       <Tab.Screen name="Ajustes" component={SettingsScreen} options={{ tabBarIcon: () => <Text>⚙️</Text> }} />
@@ -26,17 +32,19 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const [authed, setAuthed] = useState(null);
+  const { authed } = useAuth();
 
-  useEffect(() => {
-    isAuthenticated().then(setAuthed);
-  }, []);
-
-  if (authed === null) return null;
+  if (authed === null) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#1a1a2e', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color="#e94560" size="large" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#1a1a2e' }, headerTintColor: '#fff' }}>
+      <Stack.Navigator screenOptions={screenOptions}>
         {authed ? (
           <>
             <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />

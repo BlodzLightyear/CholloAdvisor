@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { register } from '../store/authStore';
+import { useAuth } from '../store/authContext';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen() {
+  const { setAuthed } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,7 +14,7 @@ export default function RegisterScreen({ navigation }) {
     setLoading(true);
     try {
       await register(email, password);
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      setAuthed(true);
     } catch (err) {
       Alert.alert('Error', err.response?.data?.error ?? 'Error al registrarse');
     } finally {

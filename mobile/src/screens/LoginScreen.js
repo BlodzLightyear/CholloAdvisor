@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { login } from '../store/authStore';
+import { useAuth } from '../store/authContext';
 
 export default function LoginScreen({ navigation }) {
+  const { setAuthed } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,7 +14,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       await login(email, password);
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      setAuthed(true);
     } catch {
       Alert.alert('Error', 'Credenciales incorrectas');
     } finally {

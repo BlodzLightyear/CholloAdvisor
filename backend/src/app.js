@@ -15,6 +15,11 @@ function createApp() {
 
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
+  app.use((err, _req, res, _next) => {
+    console.error('Unhandled error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  });
+
   return app;
 }
 

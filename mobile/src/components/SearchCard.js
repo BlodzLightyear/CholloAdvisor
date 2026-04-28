@@ -1,13 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-function PriceTrend({ current, best }) {
-  if (!best || current === best) return <Text style={styles.trendFlat}>→</Text>;
-  return current < best
-    ? <Text style={styles.trendDown}>↓ mejor precio</Text>
-    : <Text style={styles.trendUp}>↑</Text>;
-}
-
 export default function SearchCard({ search, onHistory, onToggle, onDelete }) {
   const isActive = search.status === 'active';
 
@@ -25,7 +18,6 @@ export default function SearchCard({ search, onHistory, onToggle, onDelete }) {
           <>
             <Text style={styles.price}>{search.best_price_euros}€</Text>
             <Text style={styles.airline}>{search.best_price_airline}</Text>
-            <PriceTrend current={search.best_price_euros} best={search.best_price_euros} />
           </>
         ) : (
           <Text style={styles.noPrice}>Sin datos aún</Text>
@@ -53,9 +45,6 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
   price: { color: '#e94560', fontSize: 26, fontWeight: 'bold' },
   airline: { color: '#aaa', fontSize: 14 },
-  trendDown: { color: '#2ecc71', fontWeight: 'bold' },
-  trendUp: { color: '#e74c3c', fontWeight: 'bold' },
-  trendFlat: { color: '#aaa' },
   noPrice: { color: '#666', fontStyle: 'italic' },
   lastChecked: { color: '#555', fontSize: 11, marginBottom: 12 },
   actions: { flexDirection: 'row', gap: 8 },
