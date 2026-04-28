@@ -1,30 +1,43 @@
 const bcrypt = require('bcryptjs');
 const { getDb } = require('../db/database');
 
-function createUser(email, password) {
-  const db = getDb();
+async function createUser(email, password) {
   const passwordHash = bcrypt.hashSync(password, 10);
-  const stmt = db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)');
-  const result = stmt.run(email, passwordHash);
-  return findUserById(result.lastInsertRowid);
+  const result = await getDb().execute({
+    sql: 'INSERT INTO users (email, password_hash) VALUES (?, ?)',
+    args: [email, passwordHash],
+  });
+  return findUserById(Number(result.lastInsertRowid));
 }
 
-function findUserByEmailWithCredentials(email) {
-  return getDb().prepare('SELECT * FROM users WHERE email = ?').get(email);
+async function findUserByEmailWithCredentials(email) {
+  const result = await getDb().execute({
+    sql: 'SELECT * FROM users WHERE email = ?',
+    args: [email],
+  });
+  return result.rows[0] ?? null;
 }
 
-function findUserById(id) {
-  return getDb().prepare('SELECT id, email, fcm_token, alert_threshold_euros, default_frequency_hours, created_at FROM users WHERE id = ?').get(id);
+async function findUserById(id) {
+  const result = await getDb().execute({
+    sql: 'SELECT id, email, fcm_token, alert_threshold_euros, default_frequency_hours, created_at FROM users WHERE id = ?',
+    args: [id],
+  });
+  return result.rows[0] ?? null;
 }
 
-function updateUserFcmToken(userId, fcmToken) {
-  getDb().prepare('UPDATE users SET fcm_token = ? WHERE id = ?').run(fcmToken, userId);
+async function updateUserFcmToken(userId, fcmToken) {
+  await getDb().execute({
+    sql: 'UPDATE users SET fcm_token = ? WHERE id = ?',
+    args: [fcmToken, userId],
+  });
 }
 
-function updateUserSettings(userId, { alertThresholdEuros, defaultFrequencyHours }) {
-  getDb().prepare(
-    'UPDATE users SET alert_threshold_euros = COALESCE(?, alert_threshold_euros), default_frequency_hours = COALESCE(?, default_frequency_hours) WHERE id = ?'
-  ).run(alertThresholdEuros ?? null, defaultFrequencyHours ?? null, userId);
+async function updateUserSettings(userId, { alertThresholdEuros, defaultFrequencyHours }) {
+  await getDb().execute({
+    sql: 'UPDATE users SET alert_threshold_euros = COALESCE(?, alert_threshold_euros), default_frequency_hours = COALESCE(?, default_frequency_hours) WHERE id = ?',
+    args: [alertThresholdEuros ?? null, defaultFrequencyHours ?? null, userId],
+  });
   return findUserById(userId);
 }
 

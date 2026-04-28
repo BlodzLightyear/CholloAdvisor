@@ -6,15 +6,15 @@ const { findSearchById } = require('../models/searchModel');
 const router = express.Router();
 router.use(requireAuth);
 
-router.get('/notifications', (req, res) => {
-  const notifications = getNotificationsByUser(req.userId);
+router.get('/notifications', async (req, res) => {
+  const notifications = await getNotificationsByUser(req.userId);
   res.json({ notifications });
 });
 
-router.get('/:id/stats', (req, res) => {
-  const search = findSearchById(req.params.id);
+router.get('/:id/stats', async (req, res) => {
+  const search = await findSearchById(req.params.id);
   if (!search || search.user_id !== req.userId) return res.status(404).json({ error: 'Not found' });
-  const stats = getPriceStats(req.params.id);
+  const stats = await getPriceStats(req.params.id);
   res.json({ stats });
 });
 

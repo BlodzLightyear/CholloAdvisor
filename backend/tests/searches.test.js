@@ -1,13 +1,12 @@
 const request = require('supertest');
 const { createApp } = require('../src/app');
 const { initDb } = require('../src/db/database');
-const jwt = require('jsonwebtoken');
 
 let app, token;
 
-beforeAll(() => {
+beforeAll(async () => {
   process.env.JWT_SECRET = 'test_secret';
-  initDb(':memory:');
+  await initDb(':memory:');
   app = createApp();
 });
 

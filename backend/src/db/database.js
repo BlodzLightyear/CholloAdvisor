@@ -1,18 +1,17 @@
-const Database = require('better-sqlite3');
+const { createClient } = require('@libsql/client');
 const { runMigrations } = require('./migrations');
 
-let db;
+let client;
 
-function initDb(path = './cholloadvisor.db') {
-  db = new Database(path);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  runMigrations(db);
+async function initDb(url = 'file:cholloadvisor.db', authToken) {
+  const config = authToken ? { url, authToken } : { url };
+  client = createClient(config);
+  await runMigrations(client);
 }
 
 function getDb() {
-  if (!db) throw new Error('DB not initialized. Call initDb() first.');
-  return db;
+  if (!client) throw new Error('DB not initialized. Call initDb() first.');
+  return client;
 }
 
 module.exports = { initDb, getDb };

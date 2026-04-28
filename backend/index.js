@@ -12,8 +12,13 @@ const { initFirebase } = require('./src/services/fcmService');
 
 const PORT = process.env.PORT || 3000;
 
-initDb();
-initFirebase();
-const app = createApp();
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
-startPriceMonitor();
+(async () => {
+  await initDb(
+    process.env.TURSO_DATABASE_URL || 'file:cholloadvisor.db',
+    process.env.TURSO_AUTH_TOKEN
+  );
+  initFirebase();
+  const app = createApp();
+  app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+  startPriceMonitor();
+})();

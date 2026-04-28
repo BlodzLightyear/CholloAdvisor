@@ -4,9 +4,9 @@ const { initDb } = require('../src/db/database');
 
 let app;
 
-beforeAll(() => {
+beforeAll(async () => {
   process.env.JWT_SECRET = 'test_secret';
-  initDb(':memory:');
+  await initDb(':memory:');
   app = createApp();
 });
 

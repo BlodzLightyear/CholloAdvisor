@@ -23,23 +23,23 @@ async function checkSearchPrices(search) {
   if (!offers.length) return;
 
   const cheapest = offers.reduce((a, b) => a.priceEuros < b.priceEuros ? a : b);
-  recordPrice(search.id, cheapest);
-  updateSearch(search.id, search.user_id, { last_checked_at: new Date().toISOString() });
+  await recordPrice(search.id, cheapest);
+  await updateSearch(search.id, search.user_id, { last_checked_at: new Date().toISOString() });
 
   const previousBest = search.best_price_euros;
-  const user = findUserById(search.user_id);
+  const user = await findUserById(search.user_id);
   const threshold = user?.alert_threshold_euros ?? 10;
   const isPriceDrop = !previousBest || cheapest.priceEuros < previousBest - threshold;
 
   if (isPriceDrop) {
-    updateSearch(search.id, search.user_id, {
+    await updateSearch(search.id, search.user_id, {
       best_price_euros: cheapest.priceEuros,
       best_price_airline: cheapest.airline,
       best_price_url: cheapest.flightUrl,
     });
 
     const message = `${search.origin}→${search.destination}: ${cheapest.priceEuros}€ con ${cheapest.airline}${previousBest ? ` (era ${previousBest}€)` : ''}`;
-    saveNotification(search.user_id, search.id, { message, priceEuros: cheapest.priceEuros, airline: cheapest.airline, flightUrl: cheapest.flightUrl });
+    await saveNotification(search.user_id, search.id, { message, priceEuros: cheapest.priceEuros, airline: cheapest.airline, flightUrl: cheapest.flightUrl });
 
     if (user?.fcm_token) {
       await sendPushNotification(user.fcm_token, {
@@ -52,7 +52,7 @@ async function checkSearchPrices(search) {
 }
 
 async function runAllActiveSearches() {
-  const searches = findAllActiveSearches();
+  const searches = await findAllActiveSearches();
   const now = Date.now();
   const due = searches.filter(s => {
     if (!s.last_checked_at) return true;
