@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = __DEV__ ? 'http://10.0.2.2:3000' : 'https://your-backend.com';
+const BASE_URL = __DEV__ ? 'http://10.0.2.2:3000' : 'https://cholloadvisor.onrender.com';
 
 const client = axios.create({ baseURL: BASE_URL, timeout: 15000 });
 
