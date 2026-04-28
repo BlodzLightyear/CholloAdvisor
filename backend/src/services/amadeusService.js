@@ -22,7 +22,7 @@ async function getAccessToken() {
   );
 
   cachedToken = response.data.access_token;
-  tokenExpiresAt = Date.now() + (response.data.expires_in - 60) * 1000;
+  tokenExpiresAt = Date.now() + Math.max((response.data.expires_in ?? 1800) - 60, 0) * 1000;
 
   return cachedToken;
 }

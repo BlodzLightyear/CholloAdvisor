@@ -12,13 +12,17 @@ export default function PriceHistoryScreen({ route }) {
 
   useEffect(() => {
     async function load() {
-      const [histRes, statsRes] = await Promise.all([
-        client.get(`/searches/${searchId}/history`),
-        client.get(`/prices/${searchId}/stats`),
-      ]);
-      setRecords(histRes.data.records);
-      setStats(statsRes.data.stats);
-      setLoading(false);
+      try {
+        const [histRes, statsRes] = await Promise.all([
+          client.get(`/searches/${searchId}/history`),
+          client.get(`/prices/${searchId}/stats`),
+        ]);
+        setRecords(histRes.data.records);
+        setStats(statsRes.data.stats);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [searchId]);

@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { createUser, findUserByEmail, findUserById, updateUserFcmToken, updateUserSettings, verifyPassword } = require('../models/userModel');
+const { createUser, findUserByEmailWithCredentials, findUserById, updateUserFcmToken, updateUserSettings, verifyPassword } = require('../models/userModel');
 const { requireAuth } = require('../middleware/requireAuth');
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
-  const user = findUserByEmail(email);
+  const user = findUserByEmailWithCredentials(email);
   if (!user || !verifyPassword(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }

@@ -26,15 +26,26 @@ export default function ActiveSearchesScreen({ navigation }) {
   }
 
   async function toggleSearch(search) {
-    const newStatus = search.status === 'active' ? 'paused' : 'active';
-    await client.put(`/searches/${search.id}`, { status: newStatus });
-    loadSearches();
+    try {
+      const newStatus = search.status === 'active' ? 'paused' : 'active';
+      await client.put(`/searches/${search.id}`, { status: newStatus });
+      loadSearches();
+    } catch {
+      Alert.alert('Error', 'No se pudo actualizar la búsqueda');
+    }
   }
 
   async function deleteSearch(id) {
     Alert.alert('Eliminar', '¿Eliminar esta búsqueda?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: async () => { await client.delete(`/searches/${id}`); loadSearches(); } },
+      { text: 'Eliminar', style: 'destructive', onPress: async () => {
+        try {
+          await client.delete(`/searches/${id}`);
+          loadSearches();
+        } catch {
+          Alert.alert('Error', 'No se pudo eliminar la búsqueda');
+        }
+      }},
     ]);
   }
 

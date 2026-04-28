@@ -1,4 +1,10 @@
 require('dotenv').config();
+
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET env var is not set');
+  process.exit(1);
+}
+
 const { createApp } = require('./src/app');
 const { initDb } = require('./src/db/database');
 const { startPriceMonitor } = require('./src/services/priceMonitor');

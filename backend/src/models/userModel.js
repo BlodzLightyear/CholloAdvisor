@@ -9,7 +9,7 @@ function createUser(email, password) {
   return findUserById(result.lastInsertRowid);
 }
 
-function findUserByEmail(email) {
+function findUserByEmailWithCredentials(email) {
   return getDb().prepare('SELECT * FROM users WHERE email = ?').get(email);
 }
 
@@ -32,4 +32,4 @@ function verifyPassword(plaintext, hash) {
   return bcrypt.compareSync(plaintext, hash);
 }
 
-module.exports = { createUser, findUserByEmail, findUserById, updateUserFcmToken, updateUserSettings, verifyPassword };
+module.exports = { createUser, findUserByEmailWithCredentials, findUserById, updateUserFcmToken, updateUserSettings, verifyPassword };
